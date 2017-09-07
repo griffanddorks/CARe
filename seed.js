@@ -28,25 +28,29 @@ db
         name: "Test-Name",
         email: "Email@test.com",
         phone: "(555) 555-5555",
-        profilePic: "https://goo.gl/images/4StBwJ"
+        profilePic: "https://goo.gl/images/4StBwJ",
+        shopId: 4
       },
       {
         name: "Test-Name-2",
         email: "Email2@test.com",
         phone: "(555) 555-5555",
-        profilePic: "https://goo.gl/images/4StBwJ"
+        profilePic: "https://goo.gl/images/4StBwJ",
+        shopId: 3
       },
       {
         name: "Test-Name-3",
         email: "Email3@test.com",
         phone: "(555) 555-5555",
-        profilePic: "https://goo.gl/images/4StBwJ"
+        profilePic: "https://goo.gl/images/4StBwJ",
+        shopId: 2
       },
       {
         name: "Test-Name-4",
         email: "Email4@test.com",
         phone: "(555) 555-5555",
-        profilePic: "https://goo.gl/images/4StBwJ"
+        profilePic: "https://goo.gl/images/4StBwJ",
+        shopId: 1
       },
       {
         email: "mikegriff951@gmail.com",

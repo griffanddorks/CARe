@@ -21,8 +21,10 @@ class Appointments extends Component {
       times: [],
       time: 0,
       shopCalendar: "9aefc3b5-f55b-4f41-afd2-ccb2829fdfc8",
+      shopLocation: "",
       openList: false
     };
+
     this.handleServiceChange = this.handleServiceChange.bind(this);
     this.handleDateChange = this.handleDateChange.bind(this);
     this.handleTimeChange = this.handleTimeChange.bind(this);
@@ -94,12 +96,13 @@ class Appointments extends Component {
       app: timekitApp,
       email: timekitEmail,
       apiToken: timekitApiToken,
+      name: "Appt",
       calendar: "9aefc3b5-f55b-4f41-afd2-ccb2829fdfc8",
       availabilityView: "listing",
       timekitFindTime: {
         start: ReqBooking,
         future: "2 hours",
-        length: "30 minutes"
+        length: "1 hour"
       }
     });
 

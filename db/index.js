@@ -61,6 +61,9 @@ const Message = db.define("message", {
 User.hasMany(Car);
 Car.belongsTo(User);
 
+Shop.hasOne(User);
+User.belongsTo(Shop);
+
 Favorite.belongsTo(User, {
   through: Favorite,
   foreignKey: { name: "userId", unique: false }
