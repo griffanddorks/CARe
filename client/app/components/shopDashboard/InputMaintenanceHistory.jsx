@@ -69,15 +69,25 @@ export default class InputMaintenanceHistory extends Component {
       <Well>
         <Row>
           <Form>
-            <Col lg={3} lgOffset={1}>
+            <Col lg={6} lgOffset={1}>
               <FormGroup>
                 <ControlLabel>Service</ControlLabel>
-                {/* Maybe change service to dropdown selection */}
                 <FormControl
                   required
                   name="formServiceName"
                   type="text"
                   placeholder="Enter name of service"
+                  onChange={this.handleChange}
+                />
+              </FormGroup>
+            </Col>
+
+            <Col lg={3} lgOffset={1} sm={12}>
+              <FormGroup>
+                <ControlLabel>Date of completion</ControlLabel>
+                <FormControl
+                  name="formDate"
+                  type="date"
                   onChange={this.handleChange}
                 />
               </FormGroup>
@@ -93,27 +103,7 @@ export default class InputMaintenanceHistory extends Component {
                 />
               </FormGroup>
             </Col>
-            <Col lg={4} lgOffset={1} sm={12}>
-              <FormGroup>
-                <ControlLabel>Shop Name</ControlLabel>
-                <FormControl
-                  disabled
-                  type="text"
-                  value="Shop name from redux here"
-                />
-              </FormGroup>
-            </Col>
-            <Col lg={4} sm={12}>
-              <FormGroup>
-                <ControlLabel>Date of completion</ControlLabel>
-                <FormControl
-                  name="formDate"
-                  type="date"
-                  onChange={this.handleChange}
-                />
-              </FormGroup>
-            </Col>
-            <Col lg={2} sm={12}>
+            <Col lg={3} lgOffset={1} sm={12}>
               <FormGroup>
                 <ControlLabel>Car Mileage</ControlLabel>
                 <FormControl
