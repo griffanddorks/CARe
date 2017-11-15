@@ -38,7 +38,7 @@ module.exports = {
   getCalendar: (req, res) => {
     console.log("received request to get calendar", req.query);
     timekit
-      .auth({ email: "jhwang137@gmail.com", password: "xGmK3S7Pv5c7mAir" })
+      .auth({ email: timekitEmail, password: timekitPassword })
       .then(() => l("ShopDashCtrl: authorized tk credentials"))
       .then(() => {
         timekit
