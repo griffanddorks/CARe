@@ -156,7 +156,7 @@ class ShopDashboard extends Component {
     let dOS = this.state.daysOfService;
 
     //if the day of service has already been specified,
-    // user intends to remove day
+    //user intends to remove day
     if (dOS.some((x, i) => day.value === x)) {
       dOS.splice(dOS.indexOf(day), 1);
     } else {
