@@ -4,8 +4,6 @@ import $ from "jquery";
 import axios from "axios";
 import fullCalendar from "fullcalendar";
 
-const l = console.log;
-
 class AppointmentCalendar extends Component {
   /* ShopDashboard Appointment Calendar should
  *  // be able to render month, week, day, and daylist views of all the shops bookings
@@ -27,7 +25,6 @@ class AppointmentCalendar extends Component {
         params: { id: this.props.calId }
       })
       .then(res => {
-        l("AppointmentCalendar: getCalendar: ", res.data);
         this.props.handleGetCarInfo(res.data);
         $("#calendar").fullCalendar({
           header: {
