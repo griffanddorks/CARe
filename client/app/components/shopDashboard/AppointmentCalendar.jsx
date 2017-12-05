@@ -6,13 +6,13 @@ import fullCalendar from "fullcalendar";
 
 class AppointmentCalendar extends Component {
   /* ShopDashboard Appointment Calendar should
- *  // be able to render month, week, day, and daylist views of all the shops bookings
- *     month view should simply have an indicator of appointments (not listed)
+ *   be able to render month, week, day, and daylist views of all the shops bookings
+ *   month view should simply have an indicator of appointments (not listed)
  *   be able to click each individual appointments, and see relevant info about the booking
  *   be able to set the week hours
- *     should have the capability to set different days
- *     should be able to set different hours
- *     should query bookingjs, and set the settings
+ *   should have the capability to set different days
+ *   should be able to set different hours
+ *   should query bookingjs, and set the settings
  */
 
   constructor(props) {
