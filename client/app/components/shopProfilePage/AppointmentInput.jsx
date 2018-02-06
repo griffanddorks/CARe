@@ -10,37 +10,41 @@ import {
 import DatePicker from "react-bootstrap-date-picker";
 import TimePicker from "react-bootstrap-time-picker";
 
-const l = console.log;
-
 class AppointmentInput extends Component {
   constructor(props) {
     super(props);
     this.state = {
       time: 0,
-      start: "9:00",
-      end: "23:00"
+      start: "9:00", // default time
+      end: "23:00" // default time
     };
   }
 
+  // Once component mounts configure a rational estimation of service times.
   componentDidMount() {
-    l("AppointmentInput Mounted, received props: ", this.props);
+    //check to see if shop-client has configured days of service times
     if (this.props.daysOfService && this.props.daysOfService.length > 0) {
       let days = this.props.daysOfService;
+
+      //find the earliest startTime
       let startTime = days.reduce((startTime, day) => {
         return startTime > day.start ? day.start : startTime;
       }, days[0].start);
+
+      //find the latest endTime
       let endTime = days.reduce((endTime, time) => {
         return endTime < time.end ? time.end : endTime;
       }, days[0].end);
 
+      //convert startTime from utc to local time
       let startTimeHours = Math.floor(startTime / 3600);
       let startTimeMinutes = (startTime % 3600) / 60;
       if (startTimeMinutes < 10) {
         startTimeMinutes = "0" + startTimeMinutes;
       }
       startTime = `${startTimeHours}:${startTimeMinutes}`;
-      // l("this is the start time", startTime);
 
+      //convert endTime from utc to local time
       let endTimeHours = Math.floor(endTime / 3600);
       let endTimeMinutes = (endTime % 3600) / 60;
       if (endTimeMinutes < 10) {
@@ -48,19 +52,21 @@ class AppointmentInput extends Component {
       }
       endTime = `${endTimeHours}:${endTimeMinutes}`;
 
+      //set the state of the appointment input to configured start and endTimes
       this.setState({ start: startTime, end: endTime });
-
-      // this.setState(
-      //   {
-      //     start: `${startTimeHours.toString()}:${startTimeMinutes.toString()}`,
-      //     end: endTime
-      //   },
-      //   () => l("this is the state after setting start", this.state)
-      // );
     }
   }
 
   render() {
+    /**
+     * render for the client:
+     * (1) a list of the client's cars
+     * (2) a list of the shop's services,
+     * (3) the configured start and end times in componentDidMount
+     * (4) a list of the shop's days of service
+     * (5) a button to submit query the server given specifications
+     */
+
     return (
       <Form inline>
         <FormGroup controlId="cars">
@@ -69,13 +75,13 @@ class AppointmentInput extends Component {
             componentClass="select"
             onChange={this.props.handleCarChange}
           >
-            {this.props.currentUser.cars ? (
-              this.props.currentUser.cars.map((car, i) => (
-                <option value={car.id} key={i}>
-                  {car.make + " " + car.model + " " + car.year}
-                </option>
-              ))
-            ) : null}
+            {this.props.currentUser.cars
+              ? this.props.currentUser.cars.map((car, i) => (
+                  <option value={car.id} key={i}>
+                    {car.make + " " + car.model + " " + car.year}
+                  </option>
+                ))
+              : null}
           </FormControl>
         </FormGroup>
         <FormGroup controlId="service">

@@ -16,10 +16,6 @@ import {
 } from "react-bootstrap";
 import MaintenanceJobs from "../../components/shopDashboard/MaintenanceJobs.jsx";
 
-function l(...props) {
-  console.log(...props);
-}
-
 function mapStateToProps(state) {
   return {
     currentUser: state.currentUser.currentUser
@@ -29,8 +25,8 @@ function mapStateToProps(state) {
 class ShopDashboard extends Component {
   /*
  * should have a button to configure a booking calendar
- *   should have the ability to set hours, and days that the shop is open
- *   should have a button that creates the calendar
+ * should have the ability to set hours, and days that the shop is open
+ * should have a button that creates the calendar
  * when the calendar is created, should render a full-calendar that displays all the bookings
  */
 
@@ -62,10 +58,6 @@ class ShopDashboard extends Component {
     this.grabCalendarInfo = this.grabCalendarInfo.bind(this);
   }
   componentWillReceiveProps(nextprops) {
-    l(
-      "shop dashboard mounted & requesting calId with recieved PROPS:",
-      nextprops
-    );
     if (nextprops.currentUser.id) {
       this.setState(
         {
@@ -77,7 +69,6 @@ class ShopDashboard extends Component {
     }
   }
   componentDidMount() {
-    l("shop dashboard mounted & requesting calId PROPS:", this.props);
     if (this.props.currentUser.id) {
       this.setState(
         {
@@ -88,31 +79,41 @@ class ShopDashboard extends Component {
       );
     }
   }
+
+  /**
+   * check if the shop-client has already built a calendar
+   * @param {* shopEmail, shopId } props
+   */
   grabCalendarInfo(props) {
+    //being passed the shop's ID, pass the shop ID to the server
+    //the server checks the database for calendar ID
     axios
       .get(`api/shopdashboard/getCalId`, {
         params: { shopId: props.currentUser.shopId }
       })
       .then(res => {
-        l("getCalId responded", res);
-        this.setState({ calId: res.data.calId }, () =>
-          l("calendarId has been set", !!this.state.calId)
-        );
+        //calID will be set to null if the calendar hasn't been built
+        this.setState({ calId: res.data.calId });
       })
       .then(() => {
+        //flag to render the calendar if the calendar has been built
         if (!!this.state.calId) {
           this.setState({ hasCalendar: true });
         }
       })
-      .catch(err => l("could not get shopId"));
+      .catch(err => console.log("could not get shopId"));
   }
 
   handleGetCarInfo(appointments) {
-    this.setState({ currentAppointments: appointments }, () => {
-      console.log("WIOEGHWOIHGWIOEHGIWGH", this.state);
-    });
+    this.setState({ currentAppointments: appointments });
   }
 
+  /**
+   * handler for shopDashboard settings component
+   * @param {*} day
+   * @param {*} start // the client's desired start time for that day
+   * @param {*} end  // the client's desired end time for that day
+   */
   handleHoursOfOpChange(day, start, end) {
     let { daysOfService } = this.state;
 
@@ -126,8 +127,11 @@ class ShopDashboard extends Component {
     this.setState({ daysOfService: daysOfService });
   }
 
+  /**
+   * handler for shopDashboard settings component
+   * sends a put request to the server to update our database
+   */
   handleSetHours() {
-    l("handling setting hours");
     axios
       .put("api/shopdashboard/updateHours", {
         id: this.props.currentUser.shopId,
@@ -139,44 +143,47 @@ class ShopDashboard extends Component {
 
   handleAttributeChange(e, attribute) {
     e.preventDefault();
-
     this.setState({ [attribute]: e.target.value });
   }
 
+  /**
+   * handler for shopDashboard settings component
+   * @param {*} e  //event
+   */
   handleDaysOfServiceChange(e) {
-    const day = { start: 32400, end: 64800 }; //basic 9 to 6 work day
+    const day = { start: 32400, end: 64800 }; //9 to 6 work day in UTC
     day.value = e.target.value;
-
     let dOS = this.state.daysOfService;
 
+    //if the day of service has already been specified,
+    //user intends to remove day
     if (dOS.some((x, i) => day.value === x)) {
       dOS.splice(dOS.indexOf(day), 1);
     } else {
+      // user intends to add day of service
       let { week } = this.state;
       let idx = week.indexOf(day);
 
+      //insert the day in its proper order in the week
       for (let i = 0; i < dOS.length; i++) {
         let curr = dOS[i];
         if (week.indexOf(curr) > idx) {
           dOS.splice(i, 0, day);
-          console.log("after splice", dOS);
-          this.setState({ daysOfService: dOS }, () =>
-            l("this is the state of daysOfService, ", this.state.daysOfService)
-          );
+          this.setState({ daysOfService: dOS });
           return;
         }
       }
-      this.setState({ daysOfService: dOS.push(day) }, () =>
-        l("this is the state of daysOfService, ", this.state.daysOfService)
-      );
+      dOS.push(day);
     }
-    this.setState({ daysOfService: dOS }, () =>
-      l("this is the state of daysOfService, ", this.state.daysOfService)
-    );
+    this.setState({ daysOfService: dOS });
   }
 
+  /**
+   * populate the shop-clients dashboard with a calendar
+   * if the client their configures their days of service
+   * and hours with this handler
+   */
   handleBuildCalendar() {
-    l("user requests to create calendar. STATE:", this.state);
     let {
       firstName,
       lastName,
@@ -186,6 +193,7 @@ class ShopDashboard extends Component {
       calId
     } = this.state;
 
+    //request to post to our database and timekit
     axios
       .post(`api/shopdashboard/createCalendar`, {
         id: shopId,
@@ -196,9 +204,6 @@ class ShopDashboard extends Component {
         shopEmail: this.props.currentUser.email,
         calId: calId
       })
-      //You can create a new calendar for the current user by calling this endpoint.
-      // If the user/resource has a connected Google account, then we will save the new calendar to Google.
-      // To get the calendar synced you need to use the [PUT] /calendars/:id endpoint to set the provider_sync flag to true.
       .then(res => {
         this.setState({
           hasCalendar: true,
@@ -206,8 +211,8 @@ class ShopDashboard extends Component {
           calId: res.data.calId
         });
       })
-      .then(() => l("created tk calendar & stored id in db"))
-      .catch(err => l("could not create cal", err.data.errors));
+      .then(() => console.log("created tk calendar & stored id in db"))
+      .catch(err => console.log("could not create cal", err.data.errors));
   }
 
   render() {

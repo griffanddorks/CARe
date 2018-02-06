@@ -7,7 +7,6 @@ const {
 } = require("../../env/config");
 const { Shop, User, Appointment } = require("../../db/index.js");
 
-const l = console.log;
 //TODO: RENDER AUTHENTICATION FOR SHOP USER(RESOURCE)
 timekit.configure({
   app: timekitApp,
@@ -36,10 +35,10 @@ module.exports = {
   },
 
   getCalendar: (req, res) => {
-    console.log("received request to get calendar", req.query);
+    console.log("received request from shop-user to get calendar", req.query);
     timekit
-      .auth({ email: "jhwang137@gmail.com", password: "xGmK3S7Pv5c7mAir" })
-      .then(() => l("ShopDashCtrl: authorized tk credentials"))
+      .auth({ email: timekitEmail, password: timekitPassword })
+      .then(() => console.log("ShopDashCtrl: authorized tk credentials"))
       .then(() => {
         timekit
           .include("attributes", "calendar")
@@ -48,6 +47,7 @@ module.exports = {
             let bookings = [];
             bookings.action = "bookings request for ShopDashboard";
             books.data.forEach(booking => {
+              //check for scheduled but unfinished bookings on the specified calendar
               if (
                 !booking.completed &&
                 !!booking.calendar &&
@@ -67,7 +67,7 @@ module.exports = {
   },
 
   createCalendar: (req, res) => {
-    l(`received create calendar request`, req.body);
+    console.log("received request from shop-user to create calendar", req.body);
     let {
       firstName,
       lastName,
@@ -77,12 +77,12 @@ module.exports = {
       id,
       calId
     } = req.body;
-    let tk_api_token;
+    let tk_api_token; // receive the token from timekit
 
     const cal = {};
 
     if (!calId) {
-      l("no calendar id");
+      console.log("no calendar id, creating new timekit user");
       timekit
         .createUser({
           name: `${firstName} ${lastName}`,
@@ -92,17 +92,19 @@ module.exports = {
           email: shopEmail
         })
         .then(tk => {
-          l("created user saving api_token", tk.data.api_token);
+          console.log("created user. saving api_token", tk.data.api_token);
           tk_api_token = tk.data.api_token;
           Shop.update({ tk_api_token: tk.data.api_token }, { where: { id } });
         })
         .then(() => {
-          l("updated shop with tk api token, setting user");
+          console.log("updated shop with tk api token, setting user");
           timekit.setUser(shopEmail, tk_api_token);
         })
-        .then(tk => l("set the user"))
+        .then(tk => console.log("set the user, confirming"))
         .then(timekit.getUser)
-        .then(tk => l("here is the user", tk))
+        .then(tk =>
+          console.log("user confirmed, creating calendar for user", tk)
+        )
         .then(tk =>
           timekit.createCalendar({
             name: shopName,
@@ -110,7 +112,10 @@ module.exports = {
           })
         )
         .then(tk => {
-          l(`created tk calendar updating db with cal_id. RESPONSE: `, tk.data);
+          console.log(
+            `created tk calendar updating db with cal_id. RESPONSE: `,
+            tk.data
+          );
           cal.calId = tk.data.id;
           Shop.update({ calendar_id: tk.data.id }, { where: { id } });
         })
@@ -118,14 +123,14 @@ module.exports = {
           cal.action = "created calId for new tk user and stored in db";
           res.status(201).send(cal);
         })
-        .then(() => l("sent shop calendar_id to front end"))
+        .then(() => console.log("sent shop calendar_id to front end"))
         .catch(err => {
-          l("error creating calendar", err.data.errors);
+          console.log("error creating calendar", err.data.errors);
           res.status(400).send("could not create calendar" + err.data);
         });
     } else {
-      l("there is a cal ID");
-      // timekit.updateCalendar({id: calId}) //Update calendar is not possible for timekit
+      console.log("there is a cal ID, updating users existing calendar");
+      // timekit.updateCalendar({id: calId}) //Update calendar is not possible for timekit waiting on tk development
       timekit
         .deleteCalendar({ id: calId })
         .then(() =>
@@ -135,7 +140,7 @@ module.exports = {
           })
         )
         .then(tk => {
-          l("created new calendar for shop ");
+          console.log("created new calendar for shop ");
           cal.calId = tk.data.id;
           Shop.update({ calendar_id: tk.data.id }, { where: { id } });
         })
@@ -144,9 +149,9 @@ module.exports = {
             "create new calendar for existing tk user and stored in db";
           res.status(201).send(cal);
         })
-        .then(() => l("sent shop calendar_id to front end"))
+        .then(() => console.log("sent shop calendar_id to front end"))
         .catch(err => {
-          l("error creating calendar for existing tk user", err);
+          console.log("error creating calendar for existing tk user", err);
           res.status(400).send(err);
         });
     }

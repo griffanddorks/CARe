@@ -2,7 +2,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const db = require("../db/config");
 const express = require("express");
-const models = require("../db/index");
+
 const path = require("path");
 const routes = require("./routes/index");
 const $ = require("jquery");
